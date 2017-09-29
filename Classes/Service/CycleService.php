@@ -21,5 +21,14 @@ namespace Portrino\SvconnectorCsvExtended\Service;
  */
 class CycleService implements CycleServiceInterface
 {
+    /**
+     * @param string $table
+     * @param int $index
+     * @return double
+     */
+    public function getProgress($table, $index)
+    {
+
+    }
 
 }

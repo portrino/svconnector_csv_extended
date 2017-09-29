@@ -15,18 +15,16 @@ namespace Portrino\SvconnectorCsvExtended\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Core\SingletonInterface;
-
 /**
- * Interface CycleServiceInterface
+ * Interface FileNameServiceInterface
  * @package Portrino\SvconnectorCsvExtended\Service
  */
-interface CycleServiceInterface extends SingletonInterface
+interface FileNameServiceInterface
 {
     /**
-     * @param string $table
-     * @param int $index
-     * @return double
+     * @param string $filename
+     * @param string $identifier
+     * @return string
      */
-    public function getProgress($table, $index);
+    public static function getTempFileName($filename, $identifier = '');
 }
