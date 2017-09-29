@@ -13,14 +13,19 @@
             "role": "Developer"
         }
     ],
+    "require": {
+        "typo3/cms-core": ">=7.6.0,<9.0",
+        "cobweb/svconnector_csv": "~2.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.8.0",
+        "friendsofphp/php-cs-fixer": "^2.0",
+        "nimut/testing-framework": "^1.0"
+    },
     "autoload": {
         "psr-4": {
             "Cobweb\\SvconnectorCsvExtended\\": "Classes/"
         }
-    },
-    "require": {
-        "typo3/cms-core": ">=7.6.0,<9.0",
-        "cobweb/svconnector_csv": "~2.1.0"
     },
     "replace": {
         "svconnector_csv_extended": "self.version",
