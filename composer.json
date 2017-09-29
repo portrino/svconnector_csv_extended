@@ -1,0 +1,29 @@
+{
+    "name": "protrino/svconnector_csv_extended",
+    "type": "typo3-cms-extension",
+    "description": "Extended Connector service for reading a CSV line per line",
+    "license": [
+        "GPL-2.0+"
+    ],
+    "authors": [
+        {
+            "name": "Andre Wuttig",
+            "email": "wuttig@portrino.de",
+            "homepage": "http://www.portrino.de",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Cobweb\\SvconnectorCsvExtended\\": "Classes/"
+        }
+    },
+    "require": {
+        "typo3/cms-core": ">=7.6.0,<9.0",
+        "cobweb/svconnector_csv": ">=2.1.0"
+    },
+    "replace": {
+        "svconnector_csv": "self.version",
+        "typo3-ter/svconnector_csv": "self.version"
+    }
+}
