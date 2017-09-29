@@ -63,5 +63,4 @@ class CycleInfo
     {
         $this->lastPosition = $lastPosition;
     }
-
 }

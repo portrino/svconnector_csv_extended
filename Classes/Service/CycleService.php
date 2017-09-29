@@ -150,5 +150,4 @@ class CycleService implements CycleServiceInterface
         }
         return $result;
     }
-
 }

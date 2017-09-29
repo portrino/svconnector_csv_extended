@@ -13,19 +13,7 @@ $boot = function ($_EXTKEY) {
         $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['svconnector_csv']['fetchData'][] =
             \Portrino\SvconnectorCsvExtended\Service\CycledDataFetcher::class;
     }
-
 };
 
 $boot($_EXTKEY);
 unset($boot);
-
-
-
-
-
-
-
-
-
-
-

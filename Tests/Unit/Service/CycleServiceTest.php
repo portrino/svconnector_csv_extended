@@ -70,7 +70,7 @@ class CycleServiceTest extends UnitTestCase
             ]
         );
 
-        $this->inject($this->cycleService,'fileNameService', $this->fileNameService);
+        $this->inject($this->cycleService, 'fileNameService', $this->fileNameService);
 
         copy(
             __DIR__ . '/../Fixtures/' . self::$cycleTempFileName,

@@ -2,7 +2,6 @@
 
 namespace Portrino\SvconnectorCsvExtended\Service;
 
-
 use Cobweb\SvconnectorCsv\Service\DataFetcherInterface;
 use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -94,7 +93,5 @@ class CycledDataFetcher implements DataFetcherInterface
             $this->cycleService->storeCycleInfo($parameters, $cycleInfo);
             return $result;
         }
-
     }
-
 }

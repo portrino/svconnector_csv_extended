@@ -37,7 +37,7 @@ class CycleInfoTest extends UnitTestCase
      */
     public function setUp()
     {
-        $this->cycleInfo = new CycleInfo(1,1);
+        $this->cycleInfo = new CycleInfo(1, 1);
     }
 
     /**
@@ -93,5 +93,4 @@ class CycleInfoTest extends UnitTestCase
             $this->cycleInfo->getCycle()
         );
     }
-
 }
