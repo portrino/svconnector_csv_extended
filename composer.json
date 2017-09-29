@@ -1,5 +1,5 @@
 {
-    "name": "protrino/svconnector_csv_extended",
+    "name": "portrino/svconnector_csv_extended",
     "type": "typo3-cms-extension",
     "description": "Extended Connector service for reading a CSV line per line",
     "license": [
