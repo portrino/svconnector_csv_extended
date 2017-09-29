@@ -39,7 +39,7 @@ class FileNameServiceTest extends UnitTestCase
     /**
      * @var string
      */
-    protected static $tempPath = PATH_site . 'typo3temp/external_import/';
+    protected static $tempPath;
 
     /**
      *
@@ -47,6 +47,8 @@ class FileNameServiceTest extends UnitTestCase
     protected function setUp()
     {
         parent::setUp();
+
+        self::$tempPath = PATH_site . 'typo3temp/external_import/';
 
         $this->fileNameService = $this->getMock(
             FileNameService::class,
