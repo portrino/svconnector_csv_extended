@@ -24,5 +24,11 @@ use Nimut\TestingFramework\TestCase\UnitTestCase;
  */
 class CycleServiceTest extends UnitTestCase
 {
-
+    /**
+     * @test
+     */
+    public function foo()
+    {
+        $this->assertEquals(1, 1);
+    }
 }
