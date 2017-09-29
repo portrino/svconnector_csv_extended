@@ -46,7 +46,7 @@ class FileNameService implements FileNameServiceInterface
      * @param string $filename
      * @return string
      */
-    protected function getFileAbsFileName($filename)
+    public function getFileAbsFileName($filename)
     {
         return GeneralUtility::getFileAbsFileName($filename);
     }
@@ -55,7 +55,7 @@ class FileNameService implements FileNameServiceInterface
      * @param string $filename
      * @return bool|int
      */
-    protected function getFileModificationTime($filename)
+    public function getFileModificationTime($filename)
     {
         return filemtime($filename);
     }

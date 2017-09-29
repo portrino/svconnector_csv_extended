@@ -66,7 +66,7 @@ class FileNameServiceTest extends UnitTestCase
     public function getTempFileNameWithoutIdentifier()
     {
         $tempFileName = $this->fileNameService->getTempFileName(self::$filename);
-        $this->assertEquals('bar-1506675716286.txt', $tempFileName);
+        static::assertEquals('bar-1506675716286.txt', $tempFileName);
     }
 
     /**
@@ -75,6 +75,25 @@ class FileNameServiceTest extends UnitTestCase
     public function getTempFileNameWithIdentifier()
     {
         $tempFileName = $this->fileNameService->getTempFileName(self::$filename, 'identifier');
-        $this->assertEquals('identifier-1506675716286.txt', $tempFileName);
+        static::assertEquals('identifier-1506675716286.txt', $tempFileName);
+    }
+
+    /**
+     * @test
+     */
+    public function getFileAbsFileName()
+    {
+        $fileNameService = new FileNameService();
+        $this->assertNotEmpty($fileNameService->getFileAbsFileName('index.php'));
+    }
+
+    /**
+     * @test
+     */
+    public function getFileModificationTime()
+    {
+        $fileNameService = new FileNameService();
+        $absFileName = $fileNameService->getFileAbsFileName('index.php');
+        $this->assertGreaterThan(1, $fileNameService->getFileModificationTime($absFileName));
     }
 }
