@@ -119,6 +119,12 @@ class FileNameServiceTest extends UnitTestCase
      */
     public function getTempPathCreatesDirectoryIfNotExists()
     {
+
+        $files = glob(PATH_site . 'typo3temp/external_import/'); // get all file names
+        foreach($files as $file){ // iterate files
+            if(is_file($file))
+                unlink($file); // delete file
+        }
         rmdir(PATH_site . 'typo3temp/external_import/');
         $tempPath = $this->fileNameService->getTempPath();
         $this->assertTrue(file_exists($tempPath));

@@ -41,6 +41,14 @@ class CycleInfo
     }
 
     /**
+     *
+     */
+    public function incrementCycle()
+    {
+        $this->cycle++;
+    }
+
+    /**
      * @return int
      */
     public function getLastPosition()

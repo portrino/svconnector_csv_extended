@@ -70,6 +70,8 @@ class CycleServiceTest extends UnitTestCase
             ]
         );
 
+        $this->inject($this->cycleService,'fileNameService', $this->fileNameService);
+
         copy(
             __DIR__ . '/../Fixtures/' . self::$cycleTempFileName,
             $this->fileNameService->getTempPath() . self::$cycleTempFileName
@@ -98,9 +100,9 @@ class CycleServiceTest extends UnitTestCase
         $table = 'tx_foo_bar';
         $index = 1;
 
-        $GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['rows_per_cycle'] = 10;
+        $parameters['rows_per_cycle'] = 10;
 
-        static::assertTrue($this->cycleService->hasCycleBehaviour($table, $index));
+        static::assertTrue($this->cycleService->hasCycleBehaviour($parameters));
     }
 
     /**
@@ -110,13 +112,13 @@ class CycleServiceTest extends UnitTestCase
     {
         $table = 'tx_foo_bar';
         $index = 1;
-        $GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['rows_per_cycle'] = 10;
+        $parameters['rows_per_cycle'] = 10;
 
-        static::assertEquals(10, $this->cycleService->getRowsPerCycle($table, $index));
+        static::assertEquals(10, $this->cycleService->getRowsPerCycle($parameters));
 
-        unset($GLOBALS['TCA'][$table]['ctrl']['external'][$index]);
+        unset($parameters['rows_per_cycle']);
 
-        static::assertFalse($this->cycleService->getRowsPerCycle($table, $index));
+        static::assertFalse($this->cycleService->getRowsPerCycle($parameters));
     }
 
     /**
@@ -126,17 +128,17 @@ class CycleServiceTest extends UnitTestCase
     {
         $table = 'tx_foo_bar';
         $index = 1;
-        $GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['filename'] = 'typo3temp/' . self::$csvFile;
+        $parameters['filename'] = 'typo3temp/' . self::$csvFile;
 
-        $fileNameOfCsvFile = $this->cycleService->getFileNameOfCsvFile($table, $index);
+        $fileNameOfCsvFile = $this->cycleService->getFileNameOfCsvFile($parameters);
         static::assertContains(
             GeneralUtility::getFileAbsFileName('typo3temp/' . self::$csvFile),
             $fileNameOfCsvFile
         );
 
-        unset($GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']);
+        unset($parameters['filename']);
 
-        static::assertEmpty($this->cycleService->getFileNameOfCsvFile($table, $index));
+        static::assertEmpty($this->cycleService->getFileNameOfCsvFile($parameters));
     }
 
     /**
@@ -166,12 +168,10 @@ class CycleServiceTest extends UnitTestCase
 
         $this->inject($this->cycleService, 'fileNameService', $fileNameService);
 
-        $table = 'tx_foo_bar';
-        $index = 1;
-        $GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['filename'] = 'foo.csv';
-        $GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['rows_per_cycle'] = '2';
+        $parameters['filename'] = 'foo.csv';
+        $parameters['rows_per_cycle'] = 2;
 
-        $cycleInfo = $this->cycleService->getCycleInfo('tx_foo_bar', 1);
+        $cycleInfo = $this->cycleService->getCycleInfo($parameters);
 
         $this->assertEquals(1, $cycleInfo->getCycle());
         $this->assertEquals(936, $cycleInfo->getLastPosition());
@@ -199,7 +199,7 @@ class CycleServiceTest extends UnitTestCase
         $cycleService->expects(static::any())->method('getTotalRowsOfImportFile')->willReturn(10);
         $cycleService->expects(static::any())->method('getRowsPerCycle')->willReturn(2);
 
-        $this->assertEquals(20, $cycleService->getProgress('foo', 0));
+        $this->assertEquals(20, $cycleService->getProgress([]));
     }
 
     /**
@@ -223,7 +223,7 @@ class CycleServiceTest extends UnitTestCase
         $cycleService->expects(static::any())->method('getTotalRowsOfImportFile')->willReturn(10);
         $cycleService->expects(static::any())->method('getRowsPerCycle')->willReturn(2);
 
-        $this->assertEquals(100, $cycleService->getProgress('foo', 0));
+        $this->assertEquals(100, $cycleService->getProgress([]));
     }
 
     /**
@@ -233,9 +233,51 @@ class CycleServiceTest extends UnitTestCase
     {
         $table = 'tx_foo_bar';
         $index = 1;
-        $GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['filename'] = 'typo3temp/' . self::$csvFile;
+        $parameters['filename'] = 'typo3temp/' . self::$csvFile;
 
-        $totalRows = $this->cycleService->getTotalRowsOfImportFile($table, $index);
+        $totalRows = $this->cycleService->getTotalRowsOfImportFile($parameters);
         $this->assertEquals(3, $totalRows);
+    }
+
+    /**
+     * @test
+     */
+    public function storeCycleInfo()
+    {
+        $cycleInfo = new CycleInfo(1, 100);
+
+        $parameters['filename'] = 'typo3temp/' . self::$csvFile;
+        $parameters['rows_per_cycle'] = 2;
+
+        /** @var CycleServiceInterface|CycleService|\PHPUnit_Framework_MockObject_MockObject $cycleService */
+        $cycleService = $this->getMock(
+            CycleService::class,
+            [
+                'dummy',
+            ]
+        );
+
+        /** @var FileNameServiceInterface|FileNameService|\PHPUnit_Framework_MockObject_MockObject $fileNameService */
+        $fileNameService = $this->getMock(
+            FileNameService::class,
+            [
+                'getTempFileName'
+            ]
+        );
+        $fileNameService
+            ->expects(static::any())
+            ->method('getTempFileName')
+            ->willReturn(
+                $fileNameService->getTempPath() . 'test-123456.txt'
+            );
+        $this->inject($cycleService, 'fileNameService', $fileNameService);
+        $cycleService->storeCycleInfo($parameters, $cycleInfo);
+
+        $cycleInfo = $cycleService->getCycleInfo($parameters);
+
+        $this->assertEquals(1, $cycleInfo->getCycle());
+        $this->assertEquals(100, $cycleInfo->getLastPosition());
+
+        unlink($fileNameService->getTempPath() . 'test-123456.txt');
     }
 }

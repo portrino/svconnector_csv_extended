@@ -76,4 +76,22 @@ class CycleInfoTest extends UnitTestCase
         );
     }
 
+    /**
+     *
+     */
+    public function incrementCycle()
+    {
+        $this->cycleInfo->incrementCycle();
+
+        static::assertAttributeEquals(
+            2,
+            'cycle',
+            $this->cycleInfo
+        );
+        static::assertSame(
+            2,
+            $this->cycleInfo->getCycle()
+        );
+    }
+
 }

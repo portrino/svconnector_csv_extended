@@ -25,45 +25,42 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CycleService implements CycleServiceInterface
 {
     /**
-     * @var FileNameServiceInterface
+     * @var \Portrino\SvconnectorCsvExtended\Service\FileNameServiceInterface
      * @inject
      */
     protected $fileNameService;
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return bool
      */
-    public function hasCycleBehaviour($table, $index)
+    public function hasCycleBehaviour($parameters)
     {
-        return isset($GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['rows_per_cycle']);
+        return isset($parameters['rows_per_cycle']);
     }
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return bool|int
      */
-    public function getRowsPerCycle($table, $index)
+    public function getRowsPerCycle($parameters)
     {
         $result = false;
-        if ($this->hasCycleBehaviour($table, $index)) {
-            $result = (int)$GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['rows_per_cycle'];
+        if ($this->hasCycleBehaviour($parameters)) {
+            $result = (int)$parameters['rows_per_cycle'];
         }
         return $result;
     }
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return string
      */
-    public function getFileNameOfCsvFile($table, $index)
+    public function getFileNameOfCsvFile($parameters)
     {
         $result = '';
-        if (isset($GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['filename'])) {
-            $filename = $GLOBALS['TCA'][$table]['ctrl']['external'][$index]['parameters']['filename'];
+        if (isset($parameters['filename'])) {
+            $filename = $parameters['filename'];
             $result = GeneralUtility::getFileAbsFileName($filename);
         }
         return $result;
@@ -79,17 +76,16 @@ class CycleService implements CycleServiceInterface
     }
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return CycleInfo|null
      */
-    public function getCycleInfo($table, $index)
+    public function getCycleInfo($parameters)
     {
         $result = null;
-        if ($this->hasCycleBehaviour($table, $index)) {
-            $filename = $this->getFileNameOfCsvFile($table, $index);
+        if ($this->hasCycleBehaviour($parameters)) {
+            $filename = $this->getFileNameOfCsvFile($parameters);
             if ($this->fileIsExisting($filename)) {
-                $tempFileName = $this->fileNameService->getTempFileName($parameters);
+                $tempFileName = $this->fileNameService->getTempFileName($filename);
                 if ($this->fileIsExisting($tempFileName)) {
                     $cycleInfo = explode('#', file_get_contents($tempFileName));
                 } else {
@@ -102,18 +98,17 @@ class CycleService implements CycleServiceInterface
     }
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return bool|float
      */
-    public function getProgress($table, $index)
+    public function getProgress($parameters)
     {
         $result = false;
-        if ($this->hasCycleBehaviour($table, $index)) {
-            $cycleInfo = $this->getCycleInfo($table, $index);
+        if ($this->hasCycleBehaviour($parameters)) {
+            $cycleInfo = $this->getCycleInfo($parameters);
             if ($cycleInfo) {
-                $totalRows = $this->getTotalRowsOfImportFile($table, $index);
-                $rowsPerCycle = $this->getRowsPerCycle($table, $index);
+                $totalRows = $this->getTotalRowsOfImportFile($parameters);
+                $rowsPerCycle = $this->getRowsPerCycle($parameters);
                 $result = round((intval($cycleInfo->getCycle() * $rowsPerCycle) / $totalRows) * 100, 2);
             } else {
                 $result = 100.00;
@@ -123,16 +118,35 @@ class CycleService implements CycleServiceInterface
     }
 
     /**
-     * @param string $filename
+     * @param $parameters
      * @return int
      */
-    public function getTotalRowsOfImportFile($table, $index)
+    public function getTotalRowsOfImportFile($parameters)
     {
         $result = 0;
-        $csv = $this->getFileNameOfCsvFile($table, $index);
+        $csv = $this->getFileNameOfCsvFile($parameters);
         if ($this->fileIsExisting($csv)) {
             $fp = file($csv);
             $result = count($fp);
+        }
+        return $result;
+    }
+
+    /**
+     * @param array $parameters
+     * @param CycleInfo $cycleInfo
+     * @return bool|int
+     */
+    public function storeCycleInfo($parameters, $cycleInfo)
+    {
+        $result = false;
+        if ($this->hasCycleBehaviour($parameters)) {
+            $filename = $this->getFileNameOfCsvFile($parameters);
+            if ($this->fileIsExisting($filename)) {
+                $tempFileName = $this->fileNameService->getTempFileName($filename);
+                $string = $cycleInfo->getCycle() . '#' . (string)$cycleInfo->getLastPosition();
+                $result = file_put_contents($this->tempPath . $tempFileName, $string);
+            }
         }
         return $result;
     }

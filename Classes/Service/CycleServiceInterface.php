@@ -24,25 +24,22 @@ use TYPO3\CMS\Core\SingletonInterface;
 interface CycleServiceInterface extends SingletonInterface
 {
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return bool
      */
-    public function hasCycleBehaviour($table, $index);
+    public function hasCycleBehaviour($parameters);
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return bool|int
      */
-    public function getRowsPerCycle($table, $index);
+    public function getRowsPerCycle($parameters);
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return string
      */
-    public function getFileNameOfCsvFile($table, $index);
+    public function getFileNameOfCsvFile($parameters);
 
     /**
      * @param string $filename
@@ -51,16 +48,27 @@ interface CycleServiceInterface extends SingletonInterface
     public function fileIsExisting($filename);
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return double
      */
-    public function getProgress($table, $index);
+    public function getProgress($parameters);
 
     /**
-     * @param string $table
-     * @param int $index
+     * @param array $parameters
      * @return CycleInfo|null
      */
-    public function getCycleInfo($table, $index);
+    public function getCycleInfo($parameters);
+
+    /**
+     * @param $parameters
+     * @return int
+     */
+    public function getTotalRowsOfImportFile($parameters);
+
+    /**
+     * @param array $parameters
+     * @param CycleInfo $cycleInfo
+     * @return bool|int
+     */
+    public function storeCycleInfo($parameters, $cycleInfo);
 }
