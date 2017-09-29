@@ -26,7 +26,41 @@ interface CycleServiceInterface extends SingletonInterface
     /**
      * @param string $table
      * @param int $index
+     * @return bool
+     */
+    public function hasCycleBehaviour($table, $index);
+
+    /**
+     * @param string $table
+     * @param int $index
+     * @return bool|int
+     */
+    public function getRowsPerCycle($table, $index);
+
+    /**
+     * @param string $table
+     * @param int $index
+     * @return string
+     */
+    public function getFileNameOfCsvFile($table, $index);
+
+    /**
+     * @param string $filename
+     * @return bool
+     */
+    public function fileIsExisting($filename);
+
+    /**
+     * @param string $table
+     * @param int $index
      * @return double
      */
     public function getProgress($table, $index);
+
+    /**
+     * @param string $table
+     * @param int $index
+     * @return CycleInfo|null
+     */
+    public function getCycleInfo($table, $index);
 }

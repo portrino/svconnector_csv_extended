@@ -19,6 +19,7 @@ $EM_CONF[$_EXTKEY] = [
     'author_company' => 'portrino GmbH',
     'state' => 'beta',
     'uploadfolder' => 0,
+    'createDirs' => 'typo3temp/external_import',
     'clearCacheOnLoad' => 1,
     'version' => '1.0.0',
     'constraints' => [

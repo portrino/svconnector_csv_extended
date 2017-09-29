@@ -27,17 +27,27 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class FileNameServiceTest extends UnitTestCase
 {
     /**
-     * @var FileNameServiceInterface
+     * @var FileNameServiceInterface|FileNameService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $fileNameService;
 
+    /**
+     * @var string
+     */
     protected static $filename = 'uploads/tx_foo/bar';
 
+    /**
+     * @var string
+     */
+    protected static $tempPath = PATH_site . 'typo3temp/external_import/';
+
+    /**
+     *
+     */
     protected function setUp()
     {
         parent::setUp();
 
-        /** @var FileNameServiceInterface|\PHPUnit_Framework_MockObject_MockObject $fileNameService */
         $this->fileNameService = $this->getMock(
             FileNameService::class,
             [
@@ -65,8 +75,12 @@ class FileNameServiceTest extends UnitTestCase
      */
     public function getTempFileNameWithoutIdentifier()
     {
+
         $tempFileName = $this->fileNameService->getTempFileName(self::$filename);
-        static::assertEquals('bar-1506675716286.txt', $tempFileName);
+        static::assertEquals(
+            self::$tempPath . 'bar-1506675716286.txt',
+            $tempFileName
+        );
     }
 
     /**
@@ -75,7 +89,10 @@ class FileNameServiceTest extends UnitTestCase
     public function getTempFileNameWithIdentifier()
     {
         $tempFileName = $this->fileNameService->getTempFileName(self::$filename, 'identifier');
-        static::assertEquals('identifier-1506675716286.txt', $tempFileName);
+        static::assertEquals(
+            self::$tempPath . 'identifier-1506675716286.txt',
+            $tempFileName
+        );
     }
 
     /**
@@ -95,5 +112,15 @@ class FileNameServiceTest extends UnitTestCase
         $fileNameService = new FileNameService();
         $absFileName = $fileNameService->getFileAbsFileName('index.php');
         $this->assertGreaterThan(1, $fileNameService->getFileModificationTime($absFileName));
+    }
+
+    /**
+     * @test
+     */
+    public function getTempPathCreatesDirectoryIfNotExists()
+    {
+        rmdir(PATH_site . 'typo3temp/external_import/');
+        $tempPath = $this->fileNameService->getTempPath();
+        $this->assertTrue(file_exists($tempPath));
     }
 }

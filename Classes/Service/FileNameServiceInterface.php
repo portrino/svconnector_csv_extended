@@ -22,6 +22,11 @@ namespace Portrino\SvconnectorCsvExtended\Service;
 interface FileNameServiceInterface
 {
     /**
+     * @return string
+     */
+    public function getTempPath();
+
+    /**
      * @param string $filename
      * @param string $identifier
      * @return string

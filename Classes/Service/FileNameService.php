@@ -24,6 +24,18 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class FileNameService implements FileNameServiceInterface
 {
     /**
+     * @return string
+     */
+    public function getTempPath()
+    {
+        $tempPath = PATH_site . 'typo3temp/external_import/';
+        if (!file_exists($tempPath)) {
+            mkdir($tempPath, 0775, true);
+        }
+        return $tempPath;
+    }
+
+    /**
      * @param string $filename
      * @param string $identifier
      * @return string
@@ -33,12 +45,16 @@ class FileNameService implements FileNameServiceInterface
         $result = '';
         $absFilename = $this->getFileAbsFileName($filename);
         $modificatioTime = $this->getFileModificationTime($absFilename);
-
-        if ($identifier) {
-            $result = $identifier . '-' . $modificatioTime . '.txt';
-        } else {
-            $result = pathinfo(basename($absFilename), PATHINFO_FILENAME) . '-' . $modificatioTime . '.txt';
+        if (!$identifier) {
+            $identifier = pathinfo(basename($absFilename), PATHINFO_FILENAME);
         }
+        $result = sprintf(
+            '%s%s-%d.txt',
+            $this->getTempPath(),
+            $identifier,
+            $modificatioTime
+        );
+
         return $result;
     }
 
