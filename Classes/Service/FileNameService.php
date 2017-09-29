@@ -59,5 +59,4 @@ class FileNameService implements FileNameServiceInterface
     {
         return filemtime($filename);
     }
-
 }

@@ -28,7 +28,5 @@ class CycleService implements CycleServiceInterface
      */
     public function getProgress($table, $index)
     {
-
     }
-
 }
