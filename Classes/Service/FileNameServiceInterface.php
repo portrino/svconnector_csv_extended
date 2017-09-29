@@ -26,5 +26,5 @@ interface FileNameServiceInterface
      * @param string $identifier
      * @return string
      */
-    public static function getTempFileName($filename, $identifier = '');
+    public function getTempFileName($filename, $identifier = '');
 }

@@ -18,6 +18,7 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Portrino\SvconnectorCsvExtended\Service\FileNameService;
 use Portrino\SvconnectorCsvExtended\Service\FileNameServiceInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class FileNameServiceTest
@@ -25,30 +26,55 @@ use Portrino\SvconnectorCsvExtended\Service\FileNameServiceInterface;
  */
 class FileNameServiceTest extends UnitTestCase
 {
+    /**
+     * @var FileNameServiceInterface
+     */
+    protected $fileNameService;
+
+    protected static $filename = 'uploads/tx_foo/bar';
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        /** @var FileNameServiceInterface|\PHPUnit_Framework_MockObject_MockObject $fileNameService */
+        $this->fileNameService = $this->getMock(
+            FileNameService::class,
+            [
+                'getFileAbsFileName',
+                'getFileModificationTime',
+            ]
+        );
+        $absFilename = 'web/uploads/tx_foo/bar';
+
+        $this->fileNameService
+            ->expects(static::any())
+            ->method('getFileAbsFileName')
+            ->with(self::$filename)
+            ->willReturn($absFilename);
+        $this->fileNameService
+            ->expects(static::any())
+            ->method('getFileModificationTime')
+            ->with($absFilename)
+            ->willReturn(1506675716286);
+    }
+
 
     /**
      * @test
      */
     public function getTempFileNameWithoutIdentifier()
     {
-        /** @var FileNameServiceInterface|\PHPUnit_Framework_MockObject_MockObject $fileNameService */
-//        $fileNameService = $this->getAccessibleMock(
-//            FileNameService::class,
-//            [
-//                'dummy',
-//            ]
-//        );
+        $tempFileName = $this->fileNameService->getTempFileName(self::$filename);
+        $this->assertEquals('bar-1506675716286.txt', $tempFileName);
+    }
 
-        $fileNameService = new FileNameService();
-
-        \Codeception\Util\Debug::debug($fileNameService);
-        exit;
-
-        $fileNameService->expects(static::once())->method('getFileModificationTime')->willReturn(1506675716286);
-
-        $tempFileName = $fileNameService->getTempFileName(
-            'uploads/tx_orgadb/OFDImport/ofd.csv'
-        );
-
+    /**
+     * @test
+     */
+    public function getTempFileNameWithIdentifier()
+    {
+        $tempFileName = $this->fileNameService->getTempFileName(self::$filename, 'identifier');
+        $this->assertEquals('identifier-1506675716286.txt', $tempFileName);
     }
 }

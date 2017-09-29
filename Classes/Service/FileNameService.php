@@ -31,15 +31,24 @@ class FileNameService implements FileNameServiceInterface
     public function getTempFileName($filename, $identifier = '')
     {
         $result = '';
-        $filename = GeneralUtility::getFileAbsFileName($filename);
-        var_dump($filename);exit;
+        $absFilename = $this->getFileAbsFileName($filename);
+        $modificatioTime = $this->getFileModificationTime($absFilename);
+
         if ($identifier) {
-            $result = $identifier . '-' . self::getTempFileName($filename) . '.txt';
+            $result = $identifier . '-' . $modificatioTime . '.txt';
         } else {
-            $result = pathinfo(basename($filename),
-                    PATHINFO_FILENAME) . '-' . self::getTempFileName($filename) . '.txt';
+            $result = pathinfo(basename($absFilename), PATHINFO_FILENAME) . '-' . $modificatioTime . '.txt';
         }
         return $result;
+    }
+
+    /**
+     * @param string $filename
+     * @return string
+     */
+    protected function getFileAbsFileName($filename)
+    {
+        return GeneralUtility::getFileAbsFileName($filename);
     }
 
     /**
