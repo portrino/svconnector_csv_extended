@@ -1,6 +1,6 @@
 <?php
 
-namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
+namespace Portrino\SvconnectorCsvExtended\Service;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -15,19 +15,11 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Nimut\TestingFramework\TestCase\UnitTestCase;
-
 /**
- * Class CycleServiceTest
- * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Service
+ * Class CycleService
+ * @package Portrino\SvconnectorCsvExtended\Service
  */
-class CycleServiceTest extends UnitTestCase
+class CycleService implements CycleServiceInterface
 {
-    /**
-     * @test
-     */
-    public function foo()
-    {
-        static::assertEquals(1, 1);
-    }
+
 }

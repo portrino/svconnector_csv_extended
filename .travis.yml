@@ -46,13 +46,8 @@ script:
 
   - >
     echo;
-    echo "Running php lint";
-    find . -name \*.php ! -path "./.Build/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
-
-  - >
-    echo;
-    echo "Running PHP Coding Standards Fixer checks";
-    .Build/bin/php-cs-fixer fix --config=Build/.php_cs -v --dry-run --using-cache=no --path-mode=intersection `git diff --name-only --diff-filter=ACMRTUXB $COMMIT_RANGE`
+    echo "Running PHP PSR-2 Coding Standards Checks";
+    .Build/bin/phpcs --standard=PSR2 Classes/ Tests/Unit/
 
   - >
     echo;
