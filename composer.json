@@ -20,10 +20,10 @@
     },
     "require": {
         "typo3/cms-core": ">=7.6.0,<9.0",
-        "cobweb/svconnector_csv": ">=2.1.0"
+        "cobweb/svconnector_csv": "~2.1.0"
     },
     "replace": {
-        "svconnector_csv": "self.version",
-        "typo3-ter/svconnector_csv": "self.version"
+        "svconnector_csv_extended": "self.version",
+        "typo3-ter/svconnector_csv_extended": "self.version"
     }
 }
