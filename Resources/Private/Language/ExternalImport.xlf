@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file original="" product-name="Cobweb.FooBar" source-language="en" datatype="plaintext">
+        <body>
+            <trans-unit id="scheduler.title" xml:space="preserve">
+                <source>External import (with progress)</source>
+            </trans-unit>
+            <trans-unit id="scheduler.description" xml:space="preserve">
+                <source>This task can be used to set up automated executions of external cycled imports, be it for all tables in one go or for a single table.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

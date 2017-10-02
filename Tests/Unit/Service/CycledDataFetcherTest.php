@@ -150,7 +150,8 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['delimiter'],
             $parameters['text_qualifier'],
             true,
-            $parameters['encoding']
+            $parameters['encoding'],
+            'utf-8'
         );
 
         static::assertEquals(1, count($data));
@@ -162,7 +163,8 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['delimiter'],
             $parameters['text_qualifier'],
             true,
-            $parameters['encoding']
+            $parameters['encoding'],
+            'utf-8'
         );
 
         static::assertEquals(2, count($data));
@@ -177,7 +179,8 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['delimiter'],
             $parameters['text_qualifier'],
             true,
-            $parameters['encoding']
+            $parameters['encoding'],
+            'utf-8'
         );
 
         static::assertEquals(2, count($data));
@@ -191,7 +194,8 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['delimiter'],
             $parameters['text_qualifier'],
             true,
-            $parameters['encoding']
+            $parameters['encoding'],
+            'utf-8'
         );
 
         static::assertEquals(2, count($data));
@@ -205,7 +209,8 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['delimiter'],
             $parameters['text_qualifier'],
             true,
-            $parameters['encoding']
+            $parameters['encoding'],
+            'utf-8'
         );
 
         static::assertContains('A', $data[0][0]);

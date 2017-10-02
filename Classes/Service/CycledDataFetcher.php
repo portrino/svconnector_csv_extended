@@ -2,17 +2,30 @@
 
 namespace Portrino\SvconnectorCsvExtended\Service;
 
-use Cobweb\SvconnectorCsv\Service\DataFetcherInterface;
+/*
+ * This file is part of the TYPO3 CMS project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Service\EnvironmentService;
 
 /**
- * Class CycledFetcher
+ * Class CycledDataFetcher
  * @package Portrino\SvconnectorCsvExtended\Service
  */
-class CycledDataFetcher implements DataFetcherInterface
+class CycledDataFetcher
 {
     /**
      * @var CycleServiceInterface
@@ -25,7 +38,13 @@ class CycledDataFetcher implements DataFetcherInterface
     protected $charsetConverter;
 
     /**
+     * @var EnvironmentService
+     */
+    protected $environmentService;
+
+    /**
      * @return CycleService
+     * @codeCoverageIgnore
      */
     public function getCycleService()
     {
@@ -37,6 +56,7 @@ class CycledDataFetcher implements DataFetcherInterface
 
     /**
      * @return CharsetConverter
+     * @codeCoverageIgnore
      */
     public function getCharsetConverter()
     {
@@ -51,6 +71,7 @@ class CycledDataFetcher implements DataFetcherInterface
      * @param string $qualifier
      * @param bool $isSameCharset
      * @param string $encoding
+     * @param string $charset
      * @return array
      */
     public function fetchData(
@@ -58,7 +79,8 @@ class CycledDataFetcher implements DataFetcherInterface
         $delimiter,
         $qualifier,
         $isSameCharset,
-        $encoding
+        $encoding,
+        $charset
     ) {
         $result = [];
         $data = [];
@@ -76,11 +98,11 @@ class CycledDataFetcher implements DataFetcherInterface
                 $headers = $this->cycleService->getHeaders($parameters);
             }
 
+            $isFirstRow = true;
+            $index = 0;
+
             $fp = fopen($this->cycleService->getFileNameOfCsvFile($parameters), 'r');
             fseek($fp, $cycleInfo->getLastPosition());
-            $isFirstRow = true;
-
-            $index = 0;
             while ($row = fgetcsv($fp, 0, $delimiter, $qualifier)) {
                 // In the first row, remove UTF-8 Byte Order Mark if applicable
                 if ($isFirstRow) {
@@ -99,7 +121,7 @@ class CycledDataFetcher implements DataFetcherInterface
                 // convert every input to the proper charset
                 if (!$isSameCharset) {
                     for ($i = 0; $i < $numData; $i++) {
-                        $row[$i] = $this->charsetConverter->conv($row[$i], $encoding, $this->getCharset());
+                        $row[$i] = $this->charsetConverter->conv($row[$i], $encoding, $charset);
                     }
                 }
                 $data[] = $row;
@@ -116,6 +138,8 @@ class CycledDataFetcher implements DataFetcherInterface
                 $this->cycleService->storeCycleInfo($parameters, $cycleInfo);
             }
 
+            fclose($fp);
+
             foreach ($headers as $rowHeader) {
                 $result[] = $rowHeader;
             }
@@ -125,23 +149,5 @@ class CycledDataFetcher implements DataFetcherInterface
             }
         }
         return $result;
-    }
-
-    /**
-     * Gets the currently used character set depending on context.
-     *
-     * Defaults to UTF-8 if information is not available.
-     *
-     * @return string
-     */
-    public function getCharset()
-    {
-        if (TYPO3_MODE === 'FE') {
-            return $GLOBALS['TSFE']->renderCharset;
-        } elseif (isset($GLOBALS['LANG'])) {
-            return $GLOBALS['LANG']->charSet;
-        } else {
-            return 'utf-8';
-        }
     }
 }

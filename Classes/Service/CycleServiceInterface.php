@@ -1,5 +1,4 @@
 <?php
-
 namespace Portrino\SvconnectorCsvExtended\Service;
 
 /*
@@ -50,7 +49,7 @@ interface CycleServiceInterface extends SingletonInterface
 
     /**
      * @param array $parameters
-     * @return double
+     * @return bool|float
      */
     public function getProgress($parameters);
 
