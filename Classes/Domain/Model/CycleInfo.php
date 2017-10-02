@@ -63,4 +63,12 @@ class CycleInfo
     {
         $this->lastPosition = $lastPosition;
     }
+
+    /**
+     * @return bool
+     */
+    public function isFirstCycle()
+    {
+        return ((int)$this->cycle === 0) ? true : false;
+    }
 }

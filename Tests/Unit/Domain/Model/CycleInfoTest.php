@@ -17,9 +17,6 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
 
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
-use Portrino\SvconnectorCsvExtended\Service\CycleService;
-use Portrino\SvconnectorCsvExtended\Service\CycleServiceInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class CycleInfoTest
@@ -77,7 +74,7 @@ class CycleInfoTest extends UnitTestCase
     }
 
     /**
-     *
+     * @test
      */
     public function incrementCycle()
     {
@@ -91,6 +88,17 @@ class CycleInfoTest extends UnitTestCase
         static::assertSame(
             2,
             $this->cycleInfo->getCycle()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function isFirstCycle()
+    {
+        $this->cycleInfo->setCycle(0);
+        static::assertTrue(
+            $this->cycleInfo->isFirstCycle()
         );
     }
 }

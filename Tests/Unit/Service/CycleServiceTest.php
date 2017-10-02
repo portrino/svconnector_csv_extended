@@ -15,7 +15,6 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
 use Portrino\SvconnectorCsvExtended\Service\CycleService;
 use Portrino\SvconnectorCsvExtended\Service\CycleServiceInterface;
@@ -27,7 +26,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Class CycleServiceTest
  * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Service
  */
-class CycleServiceTest extends UnitTestCase
+class CycleServiceTest extends BaseServiceTest
 {
     /**
      * @var CycleServiceInterface|CycleService|\PHPUnit_Framework_MockObject_MockObject
@@ -38,16 +37,6 @@ class CycleServiceTest extends UnitTestCase
      * @var FileNameServiceInterface|FileNameService|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $fileNameService;
-
-    /**
-     * @var string
-     */
-    protected static $cycleTempFileName = 'tx_foo_bar-1-1506668314.txt';
-
-    /**
-     * @var string
-     */
-    protected static $csvFile = 'test.csv';
 
     /**
      *
@@ -71,37 +60,14 @@ class CycleServiceTest extends UnitTestCase
         );
 
         $this->inject($this->cycleService, 'fileNameService', $this->fileNameService);
-
-        copy(
-            __DIR__ . '/../Fixtures/' . self::$cycleTempFileName,
-            $this->fileNameService->getTempPath() . self::$cycleTempFileName
-        );
-
-        copy(
-            __DIR__ . '/../Fixtures/' . self::$csvFile,
-            PATH_site . 'typo3temp/' . self::$csvFile
-        );
     }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        unlink($this->fileNameService->getTempPath() . self::$cycleTempFileName);
-        unlink(PATH_site . 'typo3temp/' . self::$csvFile);
-    }
-
 
     /**
      * @test
      */
     public function hasCycleBehaviour()
     {
-        $table = 'tx_foo_bar';
-        $index = 1;
-
         $parameters['rows_per_cycle'] = 10;
-
         static::assertTrue($this->cycleService->hasCycleBehaviour($parameters));
     }
 
@@ -110,14 +76,9 @@ class CycleServiceTest extends UnitTestCase
      */
     public function getRowsPerCycle()
     {
-        $table = 'tx_foo_bar';
-        $index = 1;
         $parameters['rows_per_cycle'] = 10;
-
         static::assertEquals(10, $this->cycleService->getRowsPerCycle($parameters));
-
         unset($parameters['rows_per_cycle']);
-
         static::assertFalse($this->cycleService->getRowsPerCycle($parameters));
     }
 
@@ -126,18 +87,16 @@ class CycleServiceTest extends UnitTestCase
      */
     public function getFileNameOfCsvFile()
     {
-        $table = 'tx_foo_bar';
-        $index = 1;
-        $parameters['filename'] = 'typo3temp/' . self::$csvFile;
-
+        $parameters = [
+            'filename' => $this->fixturePath . self::$csvFile
+        ];
         $fileNameOfCsvFile = $this->cycleService->getFileNameOfCsvFile($parameters);
         static::assertContains(
-            GeneralUtility::getFileAbsFileName('typo3temp/' . self::$csvFile),
+            GeneralUtility::getFileAbsFileName($this->fixturePath . self::$csvFile),
             $fileNameOfCsvFile
         );
 
         unset($parameters['filename']);
-
         static::assertEmpty($this->cycleService->getFileNameOfCsvFile($parameters));
     }
 
@@ -146,7 +105,8 @@ class CycleServiceTest extends UnitTestCase
      */
     public function fileIsExisting()
     {
-        $this->cycleService->fileIsExisting(GeneralUtility::getFileAbsFileName('index.php'));
+        $fileName = $this->fixturePath . self::$csvFile;
+        static::assertTrue($this->cycleService->fileIsExisting($fileName));
     }
 
     /**
@@ -164,17 +124,19 @@ class CycleServiceTest extends UnitTestCase
         $fileNameService
             ->expects(static::any())
             ->method('getTempFileName')
-            ->willReturn($fileNameService->getTempPath() . self::$cycleTempFileName);
+            ->willReturn($this->fixturePath . self::$cycleTempFileName);
 
         $this->inject($this->cycleService, 'fileNameService', $fileNameService);
 
-        $parameters['filename'] = 'foo.csv';
-        $parameters['rows_per_cycle'] = 2;
+        $parameters = [
+            'filename' => $this->fixturePath . self::$csvFile,
+            'rows_per_cycle' => 2
+        ];
 
         $cycleInfo = $this->cycleService->getCycleInfo($parameters);
 
-        $this->assertEquals(1, $cycleInfo->getCycle());
-        $this->assertEquals(936, $cycleInfo->getLastPosition());
+        static::assertEquals(1, $cycleInfo->getCycle());
+        static::assertEquals(936, $cycleInfo->getLastPosition());
     }
 
     /**
@@ -199,7 +161,7 @@ class CycleServiceTest extends UnitTestCase
         $cycleService->expects(static::any())->method('getTotalRowsOfImportFile')->willReturn(10);
         $cycleService->expects(static::any())->method('getRowsPerCycle')->willReturn(2);
 
-        $this->assertEquals(20, $cycleService->getProgress([]));
+        static::assertEquals(20, $cycleService->getProgress([]));
     }
 
     /**
@@ -223,7 +185,7 @@ class CycleServiceTest extends UnitTestCase
         $cycleService->expects(static::any())->method('getTotalRowsOfImportFile')->willReturn(10);
         $cycleService->expects(static::any())->method('getRowsPerCycle')->willReturn(2);
 
-        $this->assertEquals(100, $cycleService->getProgress([]));
+        static::assertEquals(100, $cycleService->getProgress([]));
     }
 
     /**
@@ -231,12 +193,10 @@ class CycleServiceTest extends UnitTestCase
      */
     public function getTotalRowsOfImportFile()
     {
-        $table = 'tx_foo_bar';
-        $index = 1;
-        $parameters['filename'] = 'typo3temp/' . self::$csvFile;
+        $parameters['filename'] = $this->fixturePath . self::$csvFile;
 
         $totalRows = $this->cycleService->getTotalRowsOfImportFile($parameters);
-        $this->assertEquals(3, $totalRows);
+        static::assertEquals(3, $totalRows);
     }
 
     /**
@@ -246,8 +206,10 @@ class CycleServiceTest extends UnitTestCase
     {
         $cycleInfo = new CycleInfo(1, 100);
 
-        $parameters['filename'] = 'typo3temp/' . self::$csvFile;
-        $parameters['rows_per_cycle'] = 2;
+        $parameters = [
+            'filename' => $this->fixturePath . self::$csvFile,
+            'rows_per_cycle' => 2
+        ];
 
         /** @var CycleServiceInterface|CycleService|\PHPUnit_Framework_MockObject_MockObject $cycleService */
         $cycleService = $this->getMock(
@@ -275,9 +237,30 @@ class CycleServiceTest extends UnitTestCase
 
         $cycleInfo = $cycleService->getCycleInfo($parameters);
 
-        $this->assertEquals(1, $cycleInfo->getCycle());
-        $this->assertEquals(100, $cycleInfo->getLastPosition());
+        static::assertEquals(1, $cycleInfo->getCycle());
+        static::assertEquals(100, $cycleInfo->getLastPosition());
 
         unlink($fileNameService->getTempPath() . 'test-123456.txt');
+    }
+
+    /**
+     * @test
+     */
+    public function getHeaders()
+    {
+        $parameters = [
+            'filename' => $this->fixturePath . self::$csvFileWithHeader,
+            'rows_per_cycle' => 2,
+            'skip_rows' => 1,
+            'delimiter' => ';',
+            'text_qualifier' => ''
+        ];
+
+        $headers = $this->cycleService->getHeaders($parameters);
+
+        foreach ($headers as $headerRow) {
+            static::assertContains('A', $headerRow);
+            static::assertContains('B', $headerRow);
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace Portrino\SvconnectorCsvExtended\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -71,4 +72,10 @@ interface CycleServiceInterface extends SingletonInterface
      * @return bool|int
      */
     public function storeCycleInfo($parameters, $cycleInfo);
+
+    /**
+     * @param array $parameters
+     * @return array
+     */
+    public function getHeaders($parameters);
 }

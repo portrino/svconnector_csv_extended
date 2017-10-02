@@ -16,6 +16,7 @@ namespace Portrino\SvconnectorCsvExtended\Service;
  */
 
 use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
+use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -29,6 +30,12 @@ class CycleService implements CycleServiceInterface
      * @inject
      */
     protected $fileNameService;
+
+    /**
+     * @var \TYPO3\CMS\Core\Charset\CharsetConverter
+     * @inject
+     */
+    protected $charsetConverter;
 
     /**
      * @param array $parameters
@@ -72,7 +79,7 @@ class CycleService implements CycleServiceInterface
      */
     public function fileIsExisting($filename)
     {
-        return true;
+        return file_exists($filename);
     }
 
     /**
@@ -85,7 +92,7 @@ class CycleService implements CycleServiceInterface
         if ($this->hasCycleBehaviour($parameters)) {
             $filename = $this->getFileNameOfCsvFile($parameters);
             if ($this->fileIsExisting($filename)) {
-                $tempFileName = $this->fileNameService->getTempFileName($filename);
+                $tempFileName = $this->fileNameService->getTempFileName($parameters);
                 if ($this->fileIsExisting($tempFileName)) {
                     $cycleInfo = explode('#', file_get_contents($tempFileName));
                 } else {
@@ -143,11 +150,89 @@ class CycleService implements CycleServiceInterface
         if ($this->hasCycleBehaviour($parameters)) {
             $filename = $this->getFileNameOfCsvFile($parameters);
             if ($this->fileIsExisting($filename)) {
-                $tempFileName = $this->fileNameService->getTempFileName($filename);
-                $string = $cycleInfo->getCycle() . '#' . (string)$cycleInfo->getLastPosition();
-                $result = file_put_contents($this->tempPath . $tempFileName, $string);
+                $tempFileName = $this->fileNameService->getTempFileName($parameters);
+                $cycleInfoString = $cycleInfo->getCycle() . '#' . (string)$cycleInfo->getLastPosition();
+                $result = file_put_contents($tempFileName, $cycleInfoString);
             }
         }
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders($parameters)
+    {
+        $headers = [];
+        $filename = $this->getFileNameOfCsvFile($parameters);
+        if ($this->fileIsExisting($filename)) {
+            ini_set('auto_detect_line_endings', true);
+
+
+
+            if (empty($parameters['encoding'])) {
+                $isSameCharset = true;
+            } else {
+                $encoding = $this->charsetConverter->parse_charset($parameters['encoding']);
+                $isSameCharset = $this->getCharset() == $encoding;
+            }
+
+            // Open the file and read it line by line, already interpreted as CSV data
+            $fp = fopen($filename, 'r');
+            $delimiter = (empty($parameters['delimiter'])) ? ',' : $parameters['delimiter'];
+            $qualifier = (empty($parameters['text_qualifier'])) ? '"' : $parameters['text_qualifier'];
+
+            // Set locale, if specific locale is defined
+            $oldLocale = '';
+            if (!empty($parameters['locale'])) {
+                // Get the old locale first, in order to restore it later
+                $oldLocale = setlocale(LC_ALL, 0);
+                setlocale(LC_ALL, $parameters['locale']);
+            }
+
+            $skipRows = $parameters['skip_rows'];
+            $index = 0;
+
+            while ($row = fgetcsv($fp, 0, $delimiter, $qualifier)) {
+                $numData = count($row);
+                // If the row is an array with a single NULL entry, it corresponds to a blank line
+                // and we want to skip it (see note in http://php.net/manual/en/function.fgetcsv.php#refsect1-function.fgetcsv-returnvalues)
+                if ($numData === 1 && current($row) === null) {
+                    continue;
+                }
+                // If the charset of the file is not the same as the BE charset,
+                // convert every input to the proper charset
+                if (!$isSameCharset) {
+                    for ($i = 0; $i < $numData; $i++) {
+                        $row[$i] = $this->charsetConverter->conv($row[$i], $encoding, $this->getCharset());
+                    }
+                }
+                $headers[] = $row;
+
+                $index++;
+                if ($index >= $skipRows) {
+                    break;
+                }
+            }
+        }
+        return $headers;
+    }
+
+    /**
+     * Gets the currently used character set depending on context.
+     *
+     * Defaults to UTF-8 if information is not available.
+     *
+     * @return string
+     */
+    public function getCharset()
+    {
+        if (TYPO3_MODE === 'FE') {
+            return $GLOBALS['TSFE']->renderCharset;
+        } elseif (isset($GLOBALS['LANG'])) {
+            return $GLOBALS['LANG']->charSet;
+        } else {
+            return 'utf-8';
+        }
     }
 }

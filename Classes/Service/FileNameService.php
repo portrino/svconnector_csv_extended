@@ -36,16 +36,24 @@ class FileNameService implements FileNameServiceInterface
     }
 
     /**
-     * @param string $filename
-     * @param string $identifier
+     * @param array $parameters
      * @return string
      */
-    public function getTempFileName($filename, $identifier = '')
+    public function getTempFileName($parameters)
     {
         $result = '';
+
+        $filename = $parameters['filename'];
+
+        if (isset($parameters['rows_per_cycle_identifier'])) {
+            $identifier = $parameters['rows_per_cycle_identifier'];
+        } else {
+            $identifier = false;
+        }
+
         $absFilename = $this->getFileAbsFileName($filename);
         $modificatioTime = $this->getFileModificationTime($absFilename);
-        if (!$identifier) {
+        if ($identifier === false) {
             $identifier = pathinfo(basename($absFilename), PATHINFO_FILENAME);
         }
         $result = sprintf(

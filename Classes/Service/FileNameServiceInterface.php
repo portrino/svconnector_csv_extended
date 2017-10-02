@@ -27,9 +27,8 @@ interface FileNameServiceInterface
     public function getTempPath();
 
     /**
-     * @param string $filename
-     * @param string $identifier
+     * @param array $parameters
      * @return string
      */
-    public function getTempFileName($filename, $identifier = '');
+    public function getTempFileName($parameters);
 }

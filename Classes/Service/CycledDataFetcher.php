@@ -4,9 +4,9 @@ namespace Portrino\SvconnectorCsvExtended\Service;
 
 use Cobweb\SvconnectorCsv\Service\DataFetcherInterface;
 use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
+use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Class CycledFetcher
@@ -20,46 +20,67 @@ class CycledDataFetcher implements DataFetcherInterface
     protected $cycleService;
 
     /**
-     * @var ObjectManagerInterface
+     * @var CharsetConverter
      */
-    protected $objectManager;
+    protected $charsetConverter;
 
     /**
-     * CycledDataFetcher constructor.
+     * @return CycleService
      */
-    public function __construct()
+    public function getCycleService()
     {
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->cycleService = $this->objectManager->get(CycleService::class);
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        /** @var CycleService $cycleService */
+        $cycleService = $objectManager->get(CycleService::class);
+        return $cycleService;
     }
 
     /**
-     * @param resource $fp
+     * @return CharsetConverter
+     */
+    public function getCharsetConverter()
+    {
+        /** @var CharsetConverter $charsetConverter */
+        $charsetConverter = GeneralUtility::makeInstance(CharsetConverter::class);
+        return $charsetConverter;
+    }
+
+    /**
      * @param array $parameters
      * @param string $delimiter
      * @param string $qualifier
-     * @param string $oldLocale
      * @param bool $isSameCharset
      * @param string $encoding
      * @return array
      */
     public function fetchData(
-        $fp,
         $parameters,
         $delimiter,
         $qualifier,
-        $oldLocale,
         $isSameCharset,
         $encoding
     ) {
         $result = [];
+        $data = [];
+        $headers = [];
+
+        $this->cycleService = $this->getCycleService();
+        $this->charsetConverter = $this->getCharsetConverter();
+
         if ($this->cycleService->hasCycleBehaviour($parameters)) {
             /** @var CycleInfo $cycleInfo */
             $cycleInfo = $this->cycleService->getCycleInfo($parameters);
             $rowsPerCycle = $this->cycleService->getRowsPerCycle($parameters);
-            fseek($fp, $lastPosition);
 
+            if ($cycleInfo->isFirstCycle() === false) {
+                $headers = $this->cycleService->getHeaders($parameters);
+            }
+
+            $fp = fopen($this->cycleService->getFileNameOfCsvFile($parameters), 'r');
+            fseek($fp, $cycleInfo->getLastPosition());
             $isFirstRow = true;
+
+            $index = 0;
             while ($row = fgetcsv($fp, 0, $delimiter, $qualifier)) {
                 // In the first row, remove UTF-8 Byte Order Mark if applicable
                 if ($isFirstRow) {
@@ -78,20 +99,49 @@ class CycledDataFetcher implements DataFetcherInterface
                 // convert every input to the proper charset
                 if (!$isSameCharset) {
                     for ($i = 0; $i < $numData; $i++) {
-                        $row[$i] = $this->getCharsetConverter()->conv($row[$i], $encoding, $this->getCharset());
+                        $row[$i] = $this->charsetConverter->conv($row[$i], $encoding, $this->getCharset());
                     }
                 }
-                $result[] = $row;
+                $data[] = $row;
 
                 $index++;
                 if ($index >= $rowsPerCycle) {
                     break;
                 }
             }
-            $cycleInfo->incrementCycle();
-            $cycleInfo->setLastPosition(ftell($fp));
-            $this->cycleService->storeCycleInfo($parameters, $cycleInfo);
-            return $result;
+
+            if (count($data) > 0) {
+                $cycleInfo->incrementCycle();
+                $cycleInfo->setLastPosition(ftell($fp));
+                $this->cycleService->storeCycleInfo($parameters, $cycleInfo);
+            }
+
+            foreach ($headers as $rowHeader) {
+                $result[] = $rowHeader;
+            }
+
+            foreach ($data as $rowData) {
+                $result[] = $rowData;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Gets the currently used character set depending on context.
+     *
+     * Defaults to UTF-8 if information is not available.
+     *
+     * @return string
+     */
+    public function getCharset()
+    {
+        if (TYPO3_MODE === 'FE') {
+            return $GLOBALS['TSFE']->renderCharset;
+        } elseif (isset($GLOBALS['LANG'])) {
+            return $GLOBALS['LANG']->charSet;
+        } else {
+            return 'utf-8';
         }
     }
 }

@@ -15,16 +15,14 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Portrino\SvconnectorCsvExtended\Service\FileNameService;
 use Portrino\SvconnectorCsvExtended\Service\FileNameServiceInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class FileNameServiceTest
  * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Service
  */
-class FileNameServiceTest extends UnitTestCase
+class FileNameServiceTest extends BaseServiceTest
 {
     /**
      * @var FileNameServiceInterface|FileNameService|\PHPUnit_Framework_MockObject_MockObject
@@ -37,18 +35,11 @@ class FileNameServiceTest extends UnitTestCase
     protected static $filename = 'uploads/tx_foo/bar';
 
     /**
-     * @var string
-     */
-    protected static $tempPath;
-
-    /**
      *
      */
     protected function setUp()
     {
         parent::setUp();
-
-        self::$tempPath = PATH_site . 'typo3temp/external_import/';
 
         $this->fileNameService = $this->getMock(
             FileNameService::class,
@@ -57,17 +48,16 @@ class FileNameServiceTest extends UnitTestCase
                 'getFileModificationTime',
             ]
         );
-        $absFilename = 'web/uploads/tx_foo/bar';
 
         $this->fileNameService
             ->expects(static::any())
             ->method('getFileAbsFileName')
-            ->with(self::$filename)
-            ->willReturn($absFilename);
+            ->with($this->fixturePath  . 'test.csv')
+            ->willReturn($this->fixturePath  . 'test.csv');
         $this->fileNameService
             ->expects(static::any())
             ->method('getFileModificationTime')
-            ->with($absFilename)
+            ->with($this->fixturePath  . 'test.csv')
             ->willReturn(1506675716286);
     }
 
@@ -77,10 +67,12 @@ class FileNameServiceTest extends UnitTestCase
      */
     public function getTempFileNameWithoutIdentifier()
     {
-
-        $tempFileName = $this->fileNameService->getTempFileName(self::$filename);
+        $parameters = [
+            'filename' => $this->fixturePath . 'test.csv',
+        ];
+        $tempFileName = $this->fileNameService->getTempFileName($parameters);
         static::assertEquals(
-            self::$tempPath . 'bar-1506675716286.txt',
+            $this->tempPath . 'test-1506675716286.txt',
             $tempFileName
         );
     }
@@ -90,9 +82,14 @@ class FileNameServiceTest extends UnitTestCase
      */
     public function getTempFileNameWithIdentifier()
     {
-        $tempFileName = $this->fileNameService->getTempFileName(self::$filename, 'identifier');
+        $parameters = [
+            'filename' => $this->fixturePath  . 'test.csv',
+            'rows_per_cycle_identifier' => 'tx_foo_bar'
+        ];
+
+        $tempFileName = $this->fileNameService->getTempFileName($parameters);
         static::assertEquals(
-            self::$tempPath . 'identifier-1506675716286.txt',
+            $this->tempPath . 'tx_foo_bar-1506675716286.txt',
             $tempFileName
         );
     }
@@ -121,14 +118,13 @@ class FileNameServiceTest extends UnitTestCase
      */
     public function getTempPathCreatesDirectoryIfNotExists()
     {
-
-        $files = glob(PATH_site . 'typo3temp/external_import/'); // get all file names
-        foreach ($files as $file) { // iterate files
+        $files = glob($this->tempPath . '*');
+        foreach ($files as $file) {
             if (is_file($file)) {
-                unlink($file); // delete file
+                unlink($file);
             }
         }
-        rmdir(PATH_site . 'typo3temp/external_import/');
+        rmdir($this->tempPath);
         $tempPath = $this->fileNameService->getTempPath();
         $this->assertTrue(file_exists($tempPath));
     }
