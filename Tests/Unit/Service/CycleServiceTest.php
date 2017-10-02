@@ -90,6 +90,7 @@ class CycleServiceTest extends BaseServiceTest
         $parameters = [
             'filename' => $this->fixturePath . self::$csvFile
         ];
+
         $fileNameOfCsvFile = $this->cycleService->getFileNameOfCsvFile($parameters);
         static::assertContains(
             GeneralUtility::getFileAbsFileName($this->fixturePath . self::$csvFile),
@@ -106,6 +107,7 @@ class CycleServiceTest extends BaseServiceTest
     public function fileIsExisting()
     {
         $fileName = $this->fixturePath . self::$csvFile;
+        $fileName = GeneralUtility::getFileAbsFileName($fileName);
         static::assertTrue($this->cycleService->fileIsExisting($fileName));
     }
 
@@ -121,10 +123,11 @@ class CycleServiceTest extends BaseServiceTest
                 'getTempFileName'
             ]
         );
+        $tempFileName = GeneralUtility::getFileAbsFileName($this->fixturePath . self::$cycleTempFileName);
         $fileNameService
             ->expects(static::any())
             ->method('getTempFileName')
-            ->willReturn($this->fixturePath . self::$cycleTempFileName);
+            ->willReturn($tempFileName);
 
         $this->inject($this->cycleService, 'fileNameService', $fileNameService);
 

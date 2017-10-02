@@ -60,9 +60,12 @@ abstract class BaseServiceTest extends \Nimut\TestingFramework\TestCase\UnitTest
     {
         parent::setUp();
         $this->tempPath = PATH_site . 'typo3temp/external_import/';
-        $this->fixturePath =  PATH_site . 'typo3conf/ext/svconnector_csv_extended/Tests/Unit/Fixtures/';
+        $this->fixturePath = 'EXT:svconnector_csv_extended/Tests/Unit/Fixtures/';
     }
 
+    /**
+     *
+     */
     protected function tearDown()
     {
         parent::tearDown();

@@ -25,7 +25,7 @@ use TYPO3\CMS\Core\Charset\CharsetConverter;
  * Class CycledDataFetcherTest
  * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Service
  */
-class CycledDataFetcherTest extends UnitTestCase
+class CycledDataFetcherTest extends BaseServiceTest
 {
     /**
      * @var CycledDataFetcher|\PHPUnit_Framework_MockObject_MockObject
@@ -33,39 +33,11 @@ class CycledDataFetcherTest extends UnitTestCase
     protected $cycledDataFetcher;
 
     /**
-     * @var string
-     */
-    protected static $cycleTempFileName = 'test-1506687043.txt';
-
-    /**
-     * @var string
-     */
-    protected static $csvFile = 'test.csv';
-
-    /**
-     * @var string
-     */
-    protected static $csvFileWithHeader = 'test_header.csv';
-
-    /**
-     * @var string
-     */
-    protected $tempPath;
-
-    /**
-     * @var string
-     */
-    protected $fixturePath;
-
-    /**
      *
      */
     protected function setUp()
     {
         parent::setUp();
-
-        $this->tempPath = PATH_site . 'typo3temp/external_import/';
-        $this->fixturePath = PATH_site . 'typo3conf/ext/svconnector_csv_extended/Tests/Unit/Fixtures/';
 
         $files = glob($this->tempPath . '*');
         foreach ($files as $file) {
