@@ -16,14 +16,10 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
  */
 
 use Nimut\TestingFramework\TestCase\UnitTestCase;
-use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
 use Portrino\SvconnectorCsvExtended\Service\CycledDataFetcher;
 use Portrino\SvconnectorCsvExtended\Service\CycleService;
-use Portrino\SvconnectorCsvExtended\Service\CycleServiceInterface;
 use Portrino\SvconnectorCsvExtended\Service\FileNameService;
-use Portrino\SvconnectorCsvExtended\Service\FileNameServiceInterface;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class CycledDataFetcherTest
@@ -69,7 +65,7 @@ class CycledDataFetcherTest extends UnitTestCase
         parent::setUp();
 
         $this->tempPath = PATH_site . 'typo3temp/external_import/';
-        $this->fixturePath =  PATH_site . 'typo3conf/ext/svconnector_csv_extended/Tests/Unit/Fixtures/';
+        $this->fixturePath = PATH_site . 'typo3conf/ext/svconnector_csv_extended/Tests/Unit/Fixtures/';
 
         $files = glob($this->tempPath . '*');
         foreach ($files as $file) {
@@ -151,7 +147,7 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['text_qualifier'],
             true,
             $parameters['encoding'],
-            'utf-8'
+            'utf8'
         );
 
         static::assertEquals(1, count($data));
@@ -164,7 +160,7 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['text_qualifier'],
             true,
             $parameters['encoding'],
-            'utf-8'
+            'utf8'
         );
 
         static::assertEquals(2, count($data));
@@ -180,7 +176,7 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['text_qualifier'],
             true,
             $parameters['encoding'],
-            'utf-8'
+            'utf8'
         );
 
         static::assertEquals(2, count($data));
@@ -195,7 +191,7 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['text_qualifier'],
             true,
             $parameters['encoding'],
-            'utf-8'
+            'utf8'
         );
 
         static::assertEquals(2, count($data));
@@ -210,7 +206,7 @@ class CycledDataFetcherTest extends UnitTestCase
             $parameters['text_qualifier'],
             true,
             $parameters['encoding'],
-            'utf-8'
+            'utf8'
         );
 
         static::assertContains('A', $data[0][0]);

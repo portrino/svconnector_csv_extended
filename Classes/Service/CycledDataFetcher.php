@@ -95,7 +95,7 @@ class CycledDataFetcher
             $rowsPerCycle = $this->cycleService->getRowsPerCycle($parameters);
 
             if ($cycleInfo->isFirstCycle() === false) {
-                $headers = $this->cycleService->getHeaders($parameters);
+                $headers = $this->cycleService->getHeaders($parameters, $charset);
             }
 
             $isFirstRow = true;

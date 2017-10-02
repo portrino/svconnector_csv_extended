@@ -74,7 +74,8 @@ interface CycleServiceInterface extends SingletonInterface
 
     /**
      * @param array $parameters
+     * @param string $charset
      * @return array
      */
-    public function getHeaders($parameters);
+    public function getHeaders($parameters, $charset = 'utf-8');
 }

@@ -158,9 +158,11 @@ class CycleService implements CycleServiceInterface
     }
 
     /**
+     * @param array $parameters
+     * @param string $charset
      * @return array
      */
-    public function getHeaders($parameters)
+    public function getHeaders($parameters, $charset = 'utf8')
     {
         $headers = [];
         $filename = $this->getFileNameOfCsvFile($parameters);
@@ -173,7 +175,7 @@ class CycleService implements CycleServiceInterface
                 $isSameCharset = true;
             } else {
                 $encoding = $this->charsetConverter->parse_charset($parameters['encoding']);
-                $isSameCharset = $this->getCharset() == $encoding;
+                $isSameCharset = $charset == $encoding;
             }
 
             // Open the file and read it line by line, already interpreted as CSV data
@@ -203,7 +205,7 @@ class CycleService implements CycleServiceInterface
                 // convert every input to the proper charset
                 if (!$isSameCharset) {
                     for ($i = 0; $i < $numData; $i++) {
-                        $row[$i] = $this->charsetConverter->conv($row[$i], $encoding, $this->getCharset());
+                        $row[$i] = $this->charsetConverter->conv($row[$i], $encoding, $charset);
                     }
                 }
                 $headers[] = $row;
@@ -215,23 +217,5 @@ class CycleService implements CycleServiceInterface
             }
         }
         return $headers;
-    }
-
-    /**
-     * Gets the currently used character set depending on context.
-     *
-     * Defaults to UTF-8 if information is not available.
-     *
-     * @return string
-     */
-    public function getCharset()
-    {
-        if (TYPO3_MODE === 'FE') {
-            return $GLOBALS['TSFE']->renderCharset;
-        } elseif (isset($GLOBALS['LANG'])) {
-            return $GLOBALS['LANG']->charSet;
-        } else {
-            return 'utf-8';
-        }
     }
 }
