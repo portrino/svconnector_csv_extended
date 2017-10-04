@@ -42,18 +42,9 @@ class Importer extends \Cobweb\ExternalImport\Importer
     {
         parent::__construct();
 
-        $this->cycleService = $this->getCycleService();
-    }
-
-    /**
-     * @return CycleServiceInterface
-     */
-    public function getCycleService()
-    {
         $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         /** @var CycleServiceInterface $cycleService */
-        $cycleService = $objectManager->get(CycleService::class);
-        return $cycleService;
+        $this->cycleService = $objectManager->get(CycleService::class);
     }
 
     /**
@@ -142,43 +133,6 @@ class Importer extends \Cobweb\ExternalImport\Importer
     }
 
     /**
-     * @param string $table : name of the table to get the connector for
-     * @param integer $index : index of the conector configuration to use
-     * @return NULL|ConnectorBase
-     */
-    public function getConnector($table, $index)
-    {
-        $connector = null;
-        if ($GLOBALS['BE_USER']->check('tables_modify', $table)) {
-            $this->initTCAData($table, $index);
-            // Instantiate specific connector service
-            if (empty($this->externalConfiguration['connector'])) {
-                $this->addMessage(
-                    $GLOBALS['LANG']->getLL('no_connector')
-                );
-            } else {
-                $services = ExtensionManagementUtility::findService(
-                    'connector',
-                    $this->externalConfiguration['connector']
-                );
-                // The service is not available
-                if ($services === false) {
-                    $this->addMessage(
-                        $GLOBALS['LANG']->getLL('no_service')
-                    );
-                } else {
-                    /** @var $connector ConnectorBase */
-                    $connector = GeneralUtility::makeInstanceService(
-                        'connector',
-                        $this->externalConfiguration['connector']
-                    );
-                }
-            }
-        }
-        return $connector;
-    }
-
-    /**
      * @param $table
      * @param $index
      * @return bool|float
@@ -186,8 +140,7 @@ class Importer extends \Cobweb\ExternalImport\Importer
     public function getProgressForTable($table, $index)
     {
         $result = false;
-        $configurationRepository = GeneralUtility::makeInstance(ConfigurationRepository::class);
-        $externalConfig = $configurationRepository->findByTableAndIndex(
+        $externalConfig = $this->configurationRepository->findByTableAndIndex(
             $table,
             $index
         );
@@ -204,8 +157,6 @@ class Importer extends \Cobweb\ExternalImport\Importer
      */
     public function getProgressForAllTables()
     {
-        /** @var ConfigurationRepository $configurationRepository */
-        $configurationRepository = GeneralUtility::makeInstance(ConfigurationRepository::class);
         $result = false;
         // Look in the TCA for tables with an "external" control section and a "connector"
         // Tables without connectors cannot be synchronised
@@ -232,7 +183,7 @@ class Importer extends \Cobweb\ExternalImport\Importer
         $tablesWithCycle = 0;
         foreach ($externalTables as $tables) {
             foreach ($tables as $tableData) {
-                $externalConfig = $configurationRepository->findByTableAndIndex(
+                $externalConfig = $this->configurationRepository->findByTableAndIndex(
                     $tableData['table'],
                     $tableData['index']
                 );
