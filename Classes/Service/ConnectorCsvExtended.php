@@ -42,17 +42,11 @@ class ConnectorCsvExtended extends ConnectorCsv
     protected function query($parameters)
     {
         $fileData = [];
-        if (TYPO3_DLOG || $this->extConf['debug']) {
-            GeneralUtility::devLog('Call parameters', $this->extKey, -1, $parameters);
-        }
         // Check if the file is defined and exists
         if (empty($parameters['filename'])) {
             $message = $this->sL(
                 'LLL:EXT:' . $this->extKey . '/Resources/Private/Language/locallang.xlf:no_file_defined'
             );
-            if (TYPO3_DLOG || $this->extConf['debug']) {
-                GeneralUtility::devLog($message, $this->extKey, 3);
-            }
             throw new SourceErrorException(
                 $message,
                 1299358179
@@ -94,10 +88,6 @@ class ConnectorCsvExtended extends ConnectorCsv
                     $this->getCharset()
                 );
 
-                if (TYPO3_DLOG || $this->extConf['debug']) {
-                    GeneralUtility::devLog('Data from file', $this->extKey, -1, $fileData);
-                }
-
                 // Reset locale, if necessary
                 if (!empty($oldLocale)) {
                     setlocale(LC_ALL, $oldLocale);
@@ -109,9 +99,6 @@ class ConnectorCsvExtended extends ConnectorCsv
                     $this->sL('LLL:EXT:' . $this->extKey . '/Resources/Private/Language/locallang.xlf:file_not_found'),
                     $parameters['filename']
                 );
-                if (TYPO3_DLOG || $this->extConf['debug']) {
-                    GeneralUtility::devLog($message, $this->extKey, 3);
-                }
                 throw new SourceErrorException(
                     $message,
                     1299358355
