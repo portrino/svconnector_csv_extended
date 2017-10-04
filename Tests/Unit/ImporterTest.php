@@ -43,13 +43,26 @@ class ImporterTest extends UnitTestCase
         $this->importer = $this->getAccessibleMock(
             Importer::class,
             [
-                'getCycleService'
+                'synchronizeData'
             ],
             [],
             '',
             false
         );
+
+        $this->importer
+            ->expects(static::any())
+            ->method('synchronizeData')
+            ->willReturn('success');
     }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        unset($GLOBALS['TCA']);
+    }
+
 
     /**
      * @test
@@ -110,5 +123,302 @@ class ImporterTest extends UnitTestCase
 
         $progress = $this->importer->getProgressForTable($table, $index);
         static::assertEquals(66.66, $progress);
+    }
+
+    /**
+     * @test
+     */
+    public function getProgressForAllTables()
+    {
+        $table1 = 'tx_test_one';
+        $index1 = 0;
+
+        $parameters1 = [
+            'filename' => 'EXT:svconnector_csv_extended/Test/Unit/Fixtures/test.csv',
+            'rows_per_cycle' => 2,
+            'rows_per_cycle_identifier' => 'id1'
+        ];
+
+        $externalConfig1 = [
+            'connector' => 'csv_extended',
+            'parameters' => $parameters1,
+            'priority' => 1,
+        ];
+
+        $GLOBALS['TCA'][$table1]['ctrl']['external'][$index1] = $externalConfig1;
+
+        $table2 = 'tx_test_two';
+        $index2 = 0;
+
+        $parameters2 = [
+            'filename' => 'EXT:svconnector_csv_extended/Test/Unit/Fixtures/test.csv',
+            'rows_per_cycle' => 2,
+            'rows_per_cycle_identifier' => 'id2'
+        ];
+
+        $externalConfig2 = [
+            'connector' => 'csv_extended',
+            'parameters' => $parameters2,
+            'priority' => 2,
+        ];
+
+        $GLOBALS['TCA'][$table2]['ctrl']['external'][$index2] = $externalConfig2;
+
+        $configurationRepository = $this->getMock(
+            ConfigurationRepository::class,
+            [
+                'findByTableAndIndex',
+            ]
+        );
+
+        $configurationRepository
+            ->expects(static::any())
+            ->method('findByTableAndIndex')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$table1, $index1, $externalConfig1],
+                        [$table2, $index2, $externalConfig2]
+                    ]
+                )
+            );
+
+        $this->importer->_set('configurationRepository', $configurationRepository);
+
+        $cycleService = $this->getMock(
+            CycleService::class,
+            [
+                'hasCycleBehaviour',
+                'getProgress'
+            ]
+        );
+
+        $cycleService
+            ->expects(static::any())
+            ->method('hasCycleBehaviour')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$parameters1, true],
+                        [$parameters2, true]
+                    ]
+                )
+            );
+
+        $cycleService
+            ->expects(static::any())
+            ->method('getProgress')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$parameters1, 50],
+                        [$parameters2, 0]
+                    ]
+                )
+            );
+
+        $this->importer->_set('cycleService', $cycleService);
+
+
+        $progress = $this->importer->getProgressForAllTables();
+        static::assertEquals(25, $progress);
+    }
+
+    /**
+     * @test
+     */
+    public function synchronizeAllTablesCycled()
+    {
+        $table1 = 'tx_test_one';
+        $index1 = 0;
+
+        $parameters1 = [
+            'filename' => 'EXT:svconnector_csv_extended/Test/Unit/Fixtures/test.csv',
+            'rows_per_cycle' => 2,
+            'rows_per_cycle_identifier' => 'id1'
+        ];
+
+        $externalConfig1 = [
+            'connector' => 'csv_extended',
+            'parameters' => $parameters1,
+            'priority' => 1,
+        ];
+
+        $GLOBALS['TCA'][$table1]['ctrl']['external'][$index1] = $externalConfig1;
+
+        $table2 = 'tx_test_two';
+        $index2 = 0;
+
+        $parameters2 = [
+            'filename' => 'EXT:svconnector_csv_extended/Test/Unit/Fixtures/test.csv',
+            'rows_per_cycle' => 2,
+            'rows_per_cycle_identifier' => 'id2'
+        ];
+
+        $externalConfig2 = [
+            'connector' => 'csv_extended',
+            'parameters' => $parameters2,
+            'priority' => 2,
+        ];
+
+        $GLOBALS['TCA'][$table2]['ctrl']['external'][$index2] = $externalConfig2;
+
+        $configurationRepository = $this->getMock(
+            ConfigurationRepository::class,
+            [
+                'findByTableAndIndex',
+            ]
+        );
+
+        $configurationRepository
+            ->expects(static::any())
+            ->method('findByTableAndIndex')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$table1, $index1, $externalConfig1],
+                        [$table2, $index2, $externalConfig2]
+                    ]
+                )
+            );
+
+        $this->importer->_set('configurationRepository', $configurationRepository);
+
+        $cycleService = $this->getMock(
+            CycleService::class,
+            [
+                'hasCycleBehaviour',
+                'getProgress'
+            ]
+        );
+
+        $cycleService
+            ->expects(static::any())
+            ->method('hasCycleBehaviour')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$parameters1, true],
+                        [$parameters2, true]
+                    ]
+                )
+            );
+
+        $cycleService
+            ->expects(static::any())
+            ->method('getProgress')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$parameters1, 50],
+                        [$parameters2, 0]
+                    ]
+                )
+            );
+
+        $this->importer->_set('cycleService', $cycleService);
+
+        $messages = $this->importer->synchronizeAllTables();
+        static::assertContains('success', $messages);
+    }
+
+    /**
+     * @test
+     */
+    public function synchronizeAllTablesNonCycled()
+    {
+        $table1 = 'tx_test_one';
+        $index1 = 0;
+
+        $parameters1 = [
+            'filename' => 'EXT:svconnector_csv_extended/Test/Unit/Fixtures/test.csv',
+            'rows_per_cycle' => 2,
+            'rows_per_cycle_identifier' => 'id1'
+        ];
+
+        $externalConfig1 = [
+            'connector' => 'csv_extended',
+            'parameters' => $parameters1,
+            'priority' => 1,
+        ];
+
+        $GLOBALS['TCA'][$table1]['ctrl']['external'][$index1] = $externalConfig1;
+
+        $table2 = 'tx_test_two';
+        $index2 = 0;
+
+        $parameters2 = [
+            'filename' => 'EXT:svconnector_csv_extended/Test/Unit/Fixtures/test.csv',
+            'rows_per_cycle' => 2,
+            'rows_per_cycle_identifier' => 'id2'
+        ];
+
+        $externalConfig2 = [
+            'connector' => 'csv_extended',
+            'parameters' => $parameters2,
+            'priority' => 2,
+        ];
+
+        $GLOBALS['TCA'][$table2]['ctrl']['external'][$index2] = $externalConfig2;
+
+        $configurationRepository = $this->getMock(
+            ConfigurationRepository::class,
+            [
+                'findByTableAndIndex',
+            ]
+        );
+
+        $configurationRepository
+            ->expects(static::any())
+            ->method('findByTableAndIndex')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$table1, $index1, $externalConfig1],
+                        [$table2, $index2, $externalConfig2]
+                    ]
+                )
+            );
+
+        $this->importer->_set('configurationRepository', $configurationRepository);
+
+        $cycleService = $this->getMock(
+            CycleService::class,
+            [
+                'hasCycleBehaviour',
+                'getProgress'
+            ]
+        );
+
+        $cycleService
+            ->expects(static::any())
+            ->method('hasCycleBehaviour')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$parameters1, true],
+                        [$parameters2, true]
+                    ]
+                )
+            );
+
+        $cycleService
+            ->expects(static::any())
+            ->method('getProgress')
+            ->will(
+                static::returnValueMap(
+                    [
+                        [$parameters1, false],
+                        [$parameters2, false]
+                    ]
+                )
+            );
+
+        $this->importer->_set('cycleService', $cycleService);
+
+        $messages = $this->importer->synchronizeAllTables();
+
+        static::assertEquals(2, count($messages));
+        static::assertContains('success', $messages);
     }
 }

@@ -34,6 +34,7 @@ class Importer extends \Cobweb\ExternalImport\Importer
 
     /**
      * Importer constructor.
+     * @codeCoverageIgnore
      */
     public function __construct()
     {
@@ -75,10 +76,6 @@ class Importer extends \Cobweb\ExternalImport\Importer
 
         // Sort tables by priority (lower number is highest priority)
         ksort($externalTables);
-        if ($this->extensionConfiguration['debug'] || TYPO3_DLOG) {
-            GeneralUtility::devLog($GLOBALS['LANG']->getLL('sync_all'), $this->extensionKey, 0, $externalTables);
-        }
-
         if ($this->getProgressForAllTables() === false) {
             // Synchronize all tables at once
             $allMessages = [];
