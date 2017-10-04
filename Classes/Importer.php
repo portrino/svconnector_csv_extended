@@ -15,12 +15,9 @@ namespace Portrino\SvconnectorCsvExtended;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Cobweb\ExternalImport\Domain\Repository\ConfigurationRepository;
-use Cobweb\Svconnector\Service\ConnectorBase;
 use Portrino\SvconnectorCsvExtended\Service\CycleService;
 use Portrino\SvconnectorCsvExtended\Service\CycleServiceInterface;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 

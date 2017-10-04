@@ -20,12 +20,7 @@ use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use Portrino\SvconnectorCsvExtended\Importer;
-use Portrino\SvconnectorCsvExtended\Service\ConnectorCsvExtended;
-use Portrino\SvconnectorCsvExtended\Service\CycledDataFetcher;
 use Portrino\SvconnectorCsvExtended\Service\CycleService;
-use Portrino\SvconnectorCsvExtended\Service\FileNameService;
-use TYPO3\CMS\Core\Charset\CharsetConverter;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class CycledDataFetcherTest

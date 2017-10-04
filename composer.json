@@ -15,6 +15,7 @@
     ],
     "require": {
         "typo3/cms": "^7.6",
+        "cobweb/external_import": "~3.0.6",
         "cobweb/svconnector_csv": "~2.1.0"
     },
     "require-dev": {
