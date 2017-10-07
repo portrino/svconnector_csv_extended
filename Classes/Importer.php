@@ -52,10 +52,9 @@ class Importer extends \Cobweb\ExternalImport\Importer
      */
     public function synchronizeAllTables()
     {
-        // Look in the TCA for tables with an "external" control section and a "connector"
-        // Tables without connectors cannot be synchronised
-        // @todo: use configuration repository for this
+        $allMessages = [];
         $externalTables = [];
+
         foreach ($GLOBALS['TCA'] as $tableName => $sections) {
             if (isset($sections['ctrl']['external'])) {
                 foreach ($sections['ctrl']['external'] as $index => $externalConfig) {
@@ -77,8 +76,6 @@ class Importer extends \Cobweb\ExternalImport\Importer
         // Sort tables by priority (lower number is highest priority)
         ksort($externalTables);
         if ($this->getProgressForAllTables() === false) {
-            // Synchronize all tables at once
-            $allMessages = [];
             foreach ($externalTables as $tables) {
                 foreach ($tables as $tableData) {
                     $this->messages = [
@@ -91,7 +88,9 @@ class Importer extends \Cobweb\ExternalImport\Importer
                     $allMessages[$key] = $messages;
                 }
             }
-        } else {
+        }
+
+        if ($this->getProgressForAllTables() !== false) {
             // Synchronize all tables at once
             $allMessages = [];
             foreach ($externalTables as $tableKey => $tables) {

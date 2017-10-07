@@ -41,17 +41,18 @@ class AutomatedSyncTaskWithProgress extends AutomatedSyncTask implements Progres
         /** @var Importer $importer */
         $importer = GeneralUtility::makeInstance(Importer::class);
 
-        if ($this->table == 'all') {
+        if ($this->table === 'all') {
             $result = $importer->getProgressForAllTables();
             if ($result === false) {
+                $result = 100.00;
                 if ($this->isExecutionRunning() ||
                     $this->isDisabled()) {
                     $result = 0.00;
-                } else {
-                    $result = 100.00;
                 }
             }
-        } else {
+        }
+
+        if ($this->table !== 'all') {
             $result = $importer->getProgressForTable($this->table, $this->index);
             if ($result === false) {
                 /** @var SchedulerRepository $schedulerRepository */
@@ -62,13 +63,12 @@ class AutomatedSyncTaskWithProgress extends AutomatedSyncTask implements Progres
                     $task = $tasks[$taskKey];
                     // set progressbar to zero if task is running,
                     // disabled, has no nextexecution or is late - otherwise set the task to 100%
+                    $result = 100.00;
                     if ($this->isExecutionRunning() ||
                         $this->isDisabled() ||
                         empty($task['nextexecution_tstamp']) ||
                         $task['nextexecution_tstamp'] < $GLOBALS['EXEC_TIME']) {
                         $result = 0.00;
-                    } else {
-                        $result = 100.00;
                     }
                 }
             }

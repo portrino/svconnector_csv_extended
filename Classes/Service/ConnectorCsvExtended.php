@@ -51,17 +51,20 @@ class ConnectorCsvExtended extends ConnectorCsv
                 $message,
                 1299358179
             );
-        } else {
+        }
+
+        if (isset($parameters['filename'])) {
             $filename = GeneralUtility::getFileAbsFileName($parameters['filename']);
             if (file_exists($filename)) {
                 // Force auto-detection of line endings
                 ini_set('auto_detect_line_endings', true);
 
-                // Check if the current (BE) charset is the same as the file encoding
+
                 if (empty($parameters['encoding'])) {
                     $encoding = '';
                     $isSameCharset = true;
-                } else {
+                }
+                if (isset($parameters['encoding'])) {
                     $encoding = $this->getCharsetConverter()->parse_charset($parameters['encoding']);
                     $isSameCharset = $this->getCharset() === $encoding;
                 }
@@ -94,7 +97,9 @@ class ConnectorCsvExtended extends ConnectorCsv
                 }
 
                 // Error: file does not exist
-            } else {
+            }
+
+            if (!file_exists($filename)) {
                 $message = sprintf(
                     $this->sL('LLL:EXT:' . $this->extKey . '/Resources/Private/Language/locallang.xlf:file_not_found'),
                     $parameters['filename']
@@ -105,6 +110,7 @@ class ConnectorCsvExtended extends ConnectorCsv
                 );
             }
         }
+
         // Process the result if any hook is registered
         if (is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][$this->extKey]['processResponse'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS'][$this->extKey]['processResponse'] as $className) {

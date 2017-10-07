@@ -42,13 +42,11 @@ class FileNameService implements FileNameServiceInterface
     public function getTempFileName($parameters)
     {
         $result = '';
-
+        $identifier = false;
         $filename = $parameters['filename'];
 
         if (isset($parameters['rows_per_cycle_identifier'])) {
             $identifier = $parameters['rows_per_cycle_identifier'];
-        } else {
-            $identifier = false;
         }
 
         $absFilename = $this->getFileAbsFileName($filename);

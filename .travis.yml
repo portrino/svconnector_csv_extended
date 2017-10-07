@@ -43,6 +43,11 @@ before_script:
 script:
   - >
     echo;
+    echo "Running PHP PSR-2 Coding Standards Checks";
+    build/bin/phpcs --standard=PSR2  --warning-severity=0 Classes/ Tests/Unit/
+
+  - >
+    echo;
     echo "Running unit tests";
     build/bin/phpunit --colors --coverage-clover build/logs/clover.xml Tests/Unit/
 
@@ -50,19 +55,6 @@ script:
     echo;
     echo "Running PHP Static Analysis";
     build/bin/phpstan analyze -l 7 Classes Tests
-
-  - >
-    echo;
-    echo "Running PHP PSR-2 Coding Standards Checks";
-    build/bin/phpcs --standard=PSR2  --warning-severity=0 Classes/ Tests/Unit/
-
-  - >
-    echo;
-    export typo3DatabaseName="typo3";
-    export typo3DatabaseHost="localhost";
-    export typo3DatabaseUsername="root";
-    export typo3DatabasePassword="";
-    find 'Tests/Functional' -wholename '*Test.php' | parallel --gnu 'echo; echo "Running functional test suite {}"; build/bin/phpunit --colors  -c build/vendor/nimut/testing-framework/res/Configuration/FunctionalTests.xml {}'
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

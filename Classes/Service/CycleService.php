@@ -92,10 +92,9 @@ class CycleService implements CycleServiceInterface
             $filename = $this->getFileNameOfCsvFile($parameters);
             if ($this->fileIsExisting($filename)) {
                 $tempFileName = $this->fileNameService->getTempFileName($parameters);
+                $cycleInfo = [0 => 0, 1 => 0];
                 if ($this->fileIsExisting($tempFileName)) {
                     $cycleInfo = explode('#', file_get_contents($tempFileName));
-                } else {
-                    $cycleInfo = [0 => 0, 1 => 0];
                 }
                 $result = new CycleInfo($cycleInfo[0], $cycleInfo[1]);
             }
@@ -112,12 +111,11 @@ class CycleService implements CycleServiceInterface
         $result = false;
         if ($this->hasCycleBehaviour($parameters)) {
             $cycleInfo = $this->getCycleInfo($parameters);
+            $result = 100.00;
             if ($cycleInfo) {
                 $totalRows = $this->getTotalRowsOfImportFile($parameters);
                 $rowsPerCycle = $this->getRowsPerCycle($parameters);
                 $result = round((intval($cycleInfo->getCycle() * $rowsPerCycle) / $totalRows) * 100, 2);
-            } else {
-                $result = 100.00;
             }
         }
         return $result;
@@ -169,12 +167,11 @@ class CycleService implements CycleServiceInterface
         if ($this->fileIsExisting($filename)) {
             ini_set('auto_detect_line_endings', true);
 
-
-
             if (empty($parameters['encoding'])) {
                 $isSameCharset = true;
                 $encoding = $charset;
-            } else {
+            }
+            if (isset($parameters['encoding'])) {
                 $encoding = $this->charsetConverter->parse_charset($parameters['encoding']);
                 $isSameCharset = $charset == $encoding;
             }
