@@ -60,10 +60,8 @@ class ConnectorCsvExtended extends ConnectorCsv
                 ini_set('auto_detect_line_endings', true);
 
 
-                if (empty($parameters['encoding'])) {
-                    $encoding = '';
-                    $isSameCharset = true;
-                }
+                $encoding = '';
+                $isSameCharset = true;
                 if (isset($parameters['encoding'])) {
                     $encoding = $this->getCharsetConverter()->parse_charset($parameters['encoding']);
                     $isSameCharset = $this->getCharset() === $encoding;

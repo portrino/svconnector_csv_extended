@@ -167,10 +167,8 @@ class CycleService implements CycleServiceInterface
         if ($this->fileIsExisting($filename)) {
             ini_set('auto_detect_line_endings', true);
 
-            if (empty($parameters['encoding'])) {
-                $isSameCharset = true;
-                $encoding = $charset;
-            }
+            $isSameCharset = true;
+            $encoding = $charset;
             if (isset($parameters['encoding'])) {
                 $encoding = $this->charsetConverter->parse_charset($parameters['encoding']);
                 $isSameCharset = $charset == $encoding;
