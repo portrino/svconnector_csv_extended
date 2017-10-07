@@ -14,6 +14,7 @@ namespace Portrino\SvconnectorCsvExtended\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -27,7 +28,7 @@ class FileNameService implements FileNameServiceInterface
      */
     public function getTempPath()
     {
-        $tempPath = PATH_site . 'typo3temp/external_import/';
+        $tempPath = GeneralUtility::getFileAbsFileName('typo3temp') . '/external_import/';
         if (!file_exists($tempPath)) {
             mkdir($tempPath, 0775, true);
         }

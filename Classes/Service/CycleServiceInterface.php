@@ -49,7 +49,7 @@ interface CycleServiceInterface extends SingletonInterface
 
     /**
      * @param array $parameters
-     * @return bool|float
+     * @return false|float
      */
     public function getProgress($parameters);
 

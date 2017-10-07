@@ -1,6 +1,6 @@
 <?php
 
-namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
+namespace Portrino\SvconnectorCsvExtended\Tests\Unit;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -24,7 +24,7 @@ use Portrino\SvconnectorCsvExtended\Service\CycleService;
 
 /**
  * Class CycledDataFetcherTest
- * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Service
+ * @package Portrino\SvconnectorCsvExtended\Tests\Unit
  */
 class ImporterTest extends UnitTestCase
 {

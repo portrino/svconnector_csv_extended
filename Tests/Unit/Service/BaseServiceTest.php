@@ -15,18 +15,14 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
-use Portrino\SvconnectorCsvExtended\Service\CycleService;
-use Portrino\SvconnectorCsvExtended\Service\CycleServiceInterface;
-use Portrino\SvconnectorCsvExtended\Service\FileNameService;
-use Portrino\SvconnectorCsvExtended\Service\FileNameServiceInterface;
+use Nimut\TestingFramework\TestCase\UnitTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class BaseServiceTest
  * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Service
  */
-abstract class BaseServiceTest extends \Nimut\TestingFramework\TestCase\UnitTestCase
+abstract class BaseServiceTest extends UnitTestCase
 {
     /**
      * @var string
@@ -59,7 +55,7 @@ abstract class BaseServiceTest extends \Nimut\TestingFramework\TestCase\UnitTest
     protected function setUp()
     {
         parent::setUp();
-        $this->tempPath = PATH_site . 'typo3temp/external_import/';
+        $this->tempPath = GeneralUtility::getFileAbsFileName('typo3temp') . '/external_import/';
         $this->fixturePath = 'EXT:svconnector_csv_extended/Tests/Unit/Fixtures/';
     }
 

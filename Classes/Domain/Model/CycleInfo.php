@@ -86,6 +86,6 @@ class CycleInfo
      */
     public function isFirstCycle()
     {
-        return ((int)$this->cycle === 0) ? true : false;
+        return ($this->cycle === 0) ? true : false;
     }
 }

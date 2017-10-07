@@ -129,7 +129,7 @@ class Importer extends \Cobweb\ExternalImport\Importer
     /**
      * @param $table
      * @param $index
-     * @return bool|float
+     * @return false|float
      */
     public function getProgressForTable($table, $index)
     {
@@ -146,7 +146,7 @@ class Importer extends \Cobweb\ExternalImport\Importer
     }
 
     /**
-     * @return bool|float FALSE if there are no cycle tables within the set of configured external imports,
+     * @return false|float FALSE if there are no cycle tables within the set of configured external imports,
      *                    float is the overall percentage if the progress of all import tasks
      */
     public function getProgressForAllTables()

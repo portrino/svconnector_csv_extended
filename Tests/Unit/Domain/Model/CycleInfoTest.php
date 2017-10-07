@@ -1,6 +1,6 @@
 <?php
 
-namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
+namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Domain\Model;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -15,17 +15,18 @@ namespace Portrino\SvconnectorCsvExtended\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Nimut\TestingFramework\MockObject\AccessibleMockObjectInterface;
 use Nimut\TestingFramework\TestCase\UnitTestCase;
 use Portrino\SvconnectorCsvExtended\Domain\Model\CycleInfo;
 
 /**
  * Class CycleInfoTest
- * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Service
+ * @package Portrino\SvconnectorCsvExtended\Tests\Unit\Domain\Model
  */
 class CycleInfoTest extends UnitTestCase
 {
     /**
-     * @var CycleInfo
+     * @var CycleInfo|\PHPUnit_Framework_MockObject_MockObject|AccessibleMockObjectInterface
      */
     protected $cycleInfo;
 
@@ -34,7 +35,14 @@ class CycleInfoTest extends UnitTestCase
      */
     public function setUp()
     {
-        $this->cycleInfo = new CycleInfo(1, 1);
+        $this->cycleInfo = $this->getAccessibleMock(
+            CycleInfo::class,
+            [
+                'dummy'
+            ],
+            [1,1],
+            ''
+        );
     }
 
     /**
@@ -44,12 +52,12 @@ class CycleInfoTest extends UnitTestCase
     {
         $this->cycleInfo->setCycle(1);
 
-        static::assertAttributeEquals(
+        static::assertEquals(
             1,
-            'cycle',
-            $this->cycleInfo
+            $this->cycleInfo->_get('cycle')
         );
-        static::assertSame(
+
+        static::assertEquals(
             1,
             $this->cycleInfo->getCycle()
         );
@@ -62,11 +70,11 @@ class CycleInfoTest extends UnitTestCase
     {
         $this->cycleInfo->setLastPosition(123);
 
-        static::assertAttributeEquals(
+        static::assertEquals(
             123,
-            'lastPosition',
-            $this->cycleInfo
+            $this->cycleInfo->_get('lastPosition')
         );
+
         static::assertSame(
             123,
             $this->cycleInfo->getLastPosition()
@@ -80,11 +88,11 @@ class CycleInfoTest extends UnitTestCase
     {
         $this->cycleInfo->incrementCycle();
 
-        static::assertAttributeEquals(
+        static::assertEquals(
             2,
-            'cycle',
-            $this->cycleInfo
+            $this->cycleInfo->_get('cycle')
         );
+
         static::assertSame(
             2,
             $this->cycleInfo->getCycle()

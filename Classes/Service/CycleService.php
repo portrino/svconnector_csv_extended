@@ -105,7 +105,7 @@ class CycleService implements CycleServiceInterface
 
     /**
      * @param array $parameters
-     * @return bool|float
+     * @return false|float
      */
     public function getProgress($parameters)
     {
@@ -173,6 +173,7 @@ class CycleService implements CycleServiceInterface
 
             if (empty($parameters['encoding'])) {
                 $isSameCharset = true;
+                $encoding = $charset;
             } else {
                 $encoding = $this->charsetConverter->parse_charset($parameters['encoding']);
                 $isSameCharset = $charset == $encoding;

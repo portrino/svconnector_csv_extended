@@ -36,7 +36,7 @@ class AutomatedSyncTaskWithProgress extends AutomatedSyncTask implements Progres
      */
     public function getProgress()
     {
-        $result = 100;
+        $result = 100.00;
 
         /** @var Importer $importer */
         $importer = GeneralUtility::makeInstance(Importer::class);
@@ -45,12 +45,10 @@ class AutomatedSyncTaskWithProgress extends AutomatedSyncTask implements Progres
             $result = $importer->getProgressForAllTables();
             if ($result === false) {
                 if ($this->isExecutionRunning() ||
-                    $this->isDisabled() ||
-                    empty($task['nextexecution_tstamp']) ||
-                    $task['nextexecution_tstamp'] < $GLOBALS['EXEC_TIME']) {
-                    $result = 0;
+                    $this->isDisabled()) {
+                    $result = 0.00;
                 } else {
-                    $result = 100;
+                    $result = 100.00;
                 }
             }
         } else {
@@ -68,14 +66,14 @@ class AutomatedSyncTaskWithProgress extends AutomatedSyncTask implements Progres
                         $this->isDisabled() ||
                         empty($task['nextexecution_tstamp']) ||
                         $task['nextexecution_tstamp'] < $GLOBALS['EXEC_TIME']) {
-                        $result = 0;
+                        $result = 0.00;
                     } else {
-                        $result = 100;
+                        $result = 100.00;
                     }
                 }
             }
         }
 
-        return $result;
+        return (double)$result;
     }
 }
