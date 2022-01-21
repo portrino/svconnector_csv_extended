@@ -35,7 +35,6 @@
         }
     },
     "replace": {
-        "svconnector_csv_extended": "self.version",
         "typo3-ter/svconnector_csv_extended": "self.version"
     },
     "config": {
